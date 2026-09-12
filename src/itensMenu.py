@@ -1,5 +1,5 @@
 from vendedor import insertVendedor, selectVendedor, updateVendedor, deleteVendedor
-from produto import insertProduto, selectProduto, updateProduto
+from produto import insertProduto, selectProduto, updateProduto, deleteProduto
 
 def itensVendedor():
     while True:
@@ -57,5 +57,8 @@ def itensProduto():
         elif key == '3':
             email = input("Digite o e-mail do vendedor para listar seus produtos: ")
             updateProduto(email)
+        elif key == '4':
+            email = input("Digite o e-mail do vendedor para listar seus produtos: ")
+            deleteProduto(email)
         elif key == 'voltar':
             break

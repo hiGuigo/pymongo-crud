@@ -6,6 +6,18 @@ database = connect()
 
 collection = database["produtos"]
 
+#FUNÇÃO AUXILIAR
+def encontrarProdutosVendedor(email):
+    vendedor = {"vendedor.email_vendedor": email}
+    produtosVendedor = list(collection.find(vendedor))
+
+    if not produtosVendedor:
+        print()
+        print("Este vendedor não possui produtos.")
+        return
+
+    return produtosVendedor
+
 #CREATE
 def insertProduto(nome, preco, email):
     vendedor = encontrarVendedorUnico(email)
@@ -47,13 +59,7 @@ def selectProduto(nome):
 
 #UPDATE
 def updateProduto(email):
-    vendedor = {"vendedor.email_vendedor": email}
-    produtosVendedor = list(collection.find(vendedor))
-
-    if not produtosVendedor:
-        print()
-        print("Este vendedor não possui produtos.")
-        return
+    produtosVendedor = encontrarProdutosVendedor(email)
 
     print()
     print(f"{len(produtosVendedor)} resultado(s) encontrado(s).")
@@ -105,6 +111,48 @@ def updateProduto(email):
             except Exception as erro:
                 print()
                 print("Não foi possível alterar o produto.")
+                print(erro)
+        else:
+            print()
+            print("Não existe um produto com esse número.")
+    except ValueError:
+        print()
+        print("Digite um número válido.")
+
+#DELETE
+def deleteProduto(email):
+    produtosVendedor = encontrarProdutosVendedor(email)
+    
+    print()
+    print(f"{len(produtosVendedor)} resultado(s) encontrado(s).")
+
+    for i, p in enumerate(produtosVendedor):
+        print("-----")
+        print(f"Produto nº{i}")
+        print(f"Nome: {p["nome"]}")
+        print(f"Preço: {p["preco"]}")
+    print("-----")
+
+    print()
+    produtoEscolhido = input("Digite o nº do produto que deseja alterar: ")
+
+    if not produtoEscolhido:
+        print()
+        print("Nenhum produto foi selecionado.")
+        return
+
+    try:
+        produtoEscolhido = int(produtoEscolhido)
+        if 0 <= produtoEscolhido < len(produtosVendedor):
+            produtoDeletado = produtosVendedor[produtoEscolhido]
+
+            try:
+                collection.delete_one({"_id": produtoDeletado["_id"]})
+                print()
+                print("Produto deletado com sucesso.")
+            except Exception as erro:
+                print()
+                print("Não foi possível deletar o produto.")
                 print(erro)
         else:
             print()
