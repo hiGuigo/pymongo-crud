@@ -32,10 +32,11 @@ def selectVendedor(nome):
     print(f"{len(vendedores)} resultado(s) encontrado(s).")
 
     for v in vendedores:
-                print("-----")
-                print(f"Nome: {v["nome"]}")
-                print(f"E-mail: {v["email"]}")
-    print("-----")
+                print()
+                print("####################")
+                print(f"# Nome: {v["nome"]}")
+                print(f"# E-mail: {v["email"]}")
+                print("####################")
 
 #UPDATE
 def updateVendedor(email):
