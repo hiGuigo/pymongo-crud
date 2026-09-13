@@ -64,10 +64,21 @@ def insertCompra(email):
 
         try:
             if itens:
+                while True:
+                    print()
+                    pagamento = input("Qual a forma de pagamento (PIX/CARTÃO)?")
+
+                    if pagamento in ['PIX', "CARTÃO"]:
+                        break
+                    else:
+                        print()
+                        print("--## Opção inválida! ##--")
+
                 compra = {
                     "id_comprador": comprador["_id"],
                     "nome_comprador": comprador["nome"],
                     "email_comprador": comprador["email"],
+                    "pagamento": pagamento,
                     "itens": itens
                 }
                 collection.insert_one(compra)
@@ -101,11 +112,88 @@ def selectCompra(email):
         for c in comprasComprador:
             print()
             print(f"Compra {comprasComprador.index(c)}: ")
+            print("-----")
+            print(f"Forma de pagamento: {c["pagamento"]}")
             for i in c["itens"]:
                 print("####################")
-                print(f"# Nome: {i["nome"]}")
+                print(f"# Produto: {i["nome"]}")
                 print(f"# Preço: {i["preco"]}")
                 print("####################")
+    else:
+        print()
+        print("Esse comprador não possui uma compra registrada.")
+
+#UPDATE
+def updateCompra(email):
+    comprasComprador = encontrarComprasComprador(email)
+    
+    if comprasComprador:
+        print()
+        print(f"{len(comprasComprador)} resultado(s) encontrado(s).")
+
+        for c in comprasComprador:
+            print()
+            print(f"Compra nº{comprasComprador.index(c)}: ")
+            print("-----")
+            print(f"Forma de pagamento: {c["pagamento"]}")
+            for i in c["itens"]:
+                print("####################")
+                print(f"# Produto: {i["nome"]}")
+                print(f"# Preço: {i["preco"]}")
+                print("####################")
+
+        print()
+        compraEscolhida = input("Digite o nº da compra que deseja alterar: ")
+
+        if not compraEscolhida:
+            print()
+            print("Nenhuma compra foi selecionada.")
+            return
+
+        try:
+            compraEscolhida = int(compraEscolhida)
+            if 0 <= compraEscolhida < len(comprasComprador):
+                compraAlterada = comprasComprador[compraEscolhida]
+
+                print()
+                print("-Alteração da forma de pagamento-")
+                
+                alteracoes = {}
+
+                while True:
+                    print()
+                    pagamentoAlt = input("Mudar pagamento (PIX/CARTÃO): ")
+
+                    if pagamentoAlt in ['PIX', "CARTÃO"]:
+                        break
+                    else:
+                        print()
+                        print("--## Opção inválida! ##--")
+                
+                if len(pagamentoAlt) and pagamentoAlt != compraAlterada["pagamento"]:
+                    alteracoes["pagamento"] = pagamentoAlt
+
+                try:
+                    if alteracoes:
+                        collection.update_one(
+                            {"_id": compraAlterada["_id"]},
+                            {"$set": alteracoes}
+                        )
+                        print()
+                        print("Compra alterada com sucesso.")
+                    else:
+                        print()
+                        print("Nenhuma alteração realizada.")
+                except Exception as erro:
+                    print()
+                    print("Não foi possível alterar a compra.")
+                    print(erro)
+            else:
+                print()
+                print("Não existe uma compra com esse número.")
+        except ValueError:
+            print()
+            print("Digite um número válido.")
     else:
         print()
         print("Esse comprador não possui uma compra registrada.")
@@ -123,7 +211,7 @@ def deleteCompra(email):
             print(f"Compra {comprasComprador.index(c)}: ")
             for i in c["itens"]:
                 print("####################")
-                print(f"# Nome: {i["nome"]}")
+                print(f"# Produto: {i["nome"]}")
                 print(f"# Preço: {i["preco"]}")
                 print("####################")
 

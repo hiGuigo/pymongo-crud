@@ -1,7 +1,7 @@
 from colecoes.vendedor import insertVendedor, selectVendedor, updateVendedor, deleteVendedor
 from colecoes.produto import insertProduto, selectProduto, updateProduto, deleteProduto
 from colecoes.comprador import insertComprador, selectComprador, updateComprador, deleteComprador
-from colecoes.compra import insertCompra, selectCompra, deleteCompra
+from colecoes.compra import insertCompra, selectCompra, updateCompra, deleteCompra
 
 def itensVendedor():
     while True:
@@ -129,6 +129,10 @@ def itensCompras():
             print()
             email = input("Digite o e-mail do comprador: ")
             selectCompra(email)
+        elif key == '3':
+            print()
+            email = input("Digite o e-mail do comprador: ")
+            updateCompra(email)
         elif key == '4':
             print()
             email = input("Digite o e-mail do comprador: ")

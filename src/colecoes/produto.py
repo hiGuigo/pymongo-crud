@@ -128,7 +128,6 @@ def updateProduto(email):
         print()
         print("Este vendedor não possui produtos.")
 
-
 #DELETE
 def deleteProduto(email):
     produtosVendedor = encontrarProdutosVendedor(email)
