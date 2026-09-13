@@ -7,9 +7,29 @@ database = connect()
 
 collection = database["compras"]
 
-# FUNÇÃO AUXILIAR
+# FUNÇÕES AUXILIARES
 def encontrarComprasComprador(email):
     return list(collection.find({"email_comprador": email}))
+
+def listarComprasComprador(compras):
+    print()
+    if not compras:
+        print("Esse comprador não possui uma compra registrada.")
+        return False
+    else:
+        print(f"{len(compras)} resultado(s) encontrado(s).")
+
+        for c in compras:
+            print()
+            print(f"Compra {compras.index(c)}: ")
+            print("-----")
+            print(f"Forma de pagamento: {c["pagamento"]}")
+            for i in c["itens"]:
+                print("####################")
+                print(f"# Produto: {i["nome"]}")
+                print(f"# Preço: {i["preco"]}")
+                print("####################")
+    return True
 
 #CREATE
 def insertCompra(email):
@@ -105,143 +125,99 @@ def selectCompra(email):
         print()
         print("Este e-mail não está vinculado a nenhum comprador.")
 
-    if comprasComprador:
-        print()
-        print(f"{len(comprasComprador)} resultado(s) encontrado(s).")
-
-        for c in comprasComprador:
-            print()
-            print(f"Compra {comprasComprador.index(c)}: ")
-            print("-----")
-            print(f"Forma de pagamento: {c["pagamento"]}")
-            for i in c["itens"]:
-                print("####################")
-                print(f"# Produto: {i["nome"]}")
-                print(f"# Preço: {i["preco"]}")
-                print("####################")
-    else:
-        print()
-        print("Esse comprador não possui uma compra registrada.")
+    listarComprasComprador(comprasComprador)
 
 #UPDATE
 def updateCompra(email):
     comprasComprador = encontrarComprasComprador(email)
     
-    if comprasComprador:
+    if not listarComprasComprador(comprasComprador):
+        return
+
+    print()
+    compraEscolhida = input("Digite o nº da compra que deseja alterar: ")
+
+    if not compraEscolhida:
         print()
-        print(f"{len(comprasComprador)} resultado(s) encontrado(s).")
+        print("Nenhuma compra foi selecionada.")
+        return
 
-        for c in comprasComprador:
+    try:
+        compraEscolhida = int(compraEscolhida)
+        if 0 <= compraEscolhida < len(comprasComprador):
+            compraAlterada = comprasComprador[compraEscolhida]
+
             print()
-            print(f"Compra nº{comprasComprador.index(c)}: ")
-            print("-----")
-            print(f"Forma de pagamento: {c["pagamento"]}")
-            for i in c["itens"]:
-                print("####################")
-                print(f"# Produto: {i["nome"]}")
-                print(f"# Preço: {i["preco"]}")
-                print("####################")
+            print("-Alteração da forma de pagamento-")
+            
+            alteracoes = {}
 
-        print()
-        compraEscolhida = input("Digite o nº da compra que deseja alterar: ")
-
-        if not compraEscolhida:
-            print()
-            print("Nenhuma compra foi selecionada.")
-            return
-
-        try:
-            compraEscolhida = int(compraEscolhida)
-            if 0 <= compraEscolhida < len(comprasComprador):
-                compraAlterada = comprasComprador[compraEscolhida]
-
+            while True:
                 print()
-                print("-Alteração da forma de pagamento-")
-                
-                alteracoes = {}
+                pagamentoAlt = input("Mudar pagamento (PIX/CARTÃO): ")
 
-                while True:
+                if pagamentoAlt in ['PIX', "CARTÃO"]:
+                    break
+                else:
                     print()
-                    pagamentoAlt = input("Mudar pagamento (PIX/CARTÃO): ")
+                    print("--## Opção inválida! ##--")
+            
+            if len(pagamentoAlt) and pagamentoAlt != compraAlterada["pagamento"]:
+                alteracoes["pagamento"] = pagamentoAlt
 
-                    if pagamentoAlt in ['PIX', "CARTÃO"]:
-                        break
-                    else:
-                        print()
-                        print("--## Opção inválida! ##--")
-                
-                if len(pagamentoAlt) and pagamentoAlt != compraAlterada["pagamento"]:
-                    alteracoes["pagamento"] = pagamentoAlt
-
-                try:
-                    if alteracoes:
-                        collection.update_one(
-                            {"_id": compraAlterada["_id"]},
-                            {"$set": alteracoes}
-                        )
-                        print()
-                        print("Compra alterada com sucesso.")
-                    else:
-                        print()
-                        print("Nenhuma alteração realizada.")
-                except Exception as erro:
+            try:
+                if alteracoes:
+                    collection.update_one(
+                        {"_id": compraAlterada["_id"]},
+                        {"$set": alteracoes}
+                    )
                     print()
-                    print("Não foi possível alterar a compra.")
-                    print(erro)
-            else:
+                    print("Compra alterada com sucesso.")
+                else:
+                    print()
+                    print("Nenhuma alteração realizada.")
+            except Exception as erro:
                 print()
-                print("Não existe uma compra com esse número.")
-        except ValueError:
+                print("Não foi possível alterar a compra.")
+                print(erro)
+        else:
             print()
-            print("Digite um número válido.")
-    else:
+            print("Não existe uma compra com esse número.")
+    except ValueError:
         print()
-        print("Esse comprador não possui uma compra registrada.")
+        print("Digite um número válido.")
 
 #DELETE
 def deleteCompra(email):
     comprasComprador = encontrarComprasComprador(email)
 
-    if comprasComprador:
+    if not listarComprasComprador(comprasComprador):
+        return
+
+    print()
+    compraEscolhida = input("Digite o nº da compra que deseja deletar: ")
+
+    if not compraEscolhida:
         print()
-        print(f"{len(comprasComprador)} resultado(s) encontrado(s).")
+        print("Nenhuma compra foi selecionada.")
+        return
 
-        for c in comprasComprador:
-            print()
-            print(f"Compra {comprasComprador.index(c)}: ")
-            for i in c["itens"]:
-                print("####################")
-                print(f"# Produto: {i["nome"]}")
-                print(f"# Preço: {i["preco"]}")
-                print("####################")
+    try:
+        compraEscolhida = int(compraEscolhida)
+        if 0 <= compraEscolhida < len(comprasComprador):
+            compraDeletada = comprasComprador[compraEscolhida]
 
-        print()
-        compraEscolhida = input("Digite o nº da compra que deseja deletar: ")
-
-        if not compraEscolhida:
-            print()
-            print("Nenhuma compra foi selecionada.")
-            return
-
-        try:
-            compraEscolhida = int(compraEscolhida)
-            if 0 <= compraEscolhida < len(comprasComprador):
-                compraDeletada = comprasComprador[compraEscolhida]
-
-                try:
-                    collection.delete_one({"_id": compraDeletada["_id"]})
-                    print()
-                    print("Compra deletada com sucesso.")
-                except Exception as erro:
-                    print()
-                    print("Não foi possível deletar a cmopra.")
-                    print(erro)
-            else:
+            try:
+                collection.delete_one({"_id": compraDeletada["_id"]})
                 print()
-                print("Não existe uma compra com esse número.")
-        except ValueError:
+                print("Compra deletada com sucesso.")
+            except Exception as erro:
+                print()
+                print("Não foi possível deletar a cmopra.")
+                print(erro)
+        else:
             print()
-            print("Digite um número válido.")
-    else:
+            print("Não existe uma compra com esse número.")
+    except ValueError:
         print()
-        print("Esse comprador não possui uma compra registrada.")
+        print("Digite um número válido.")
