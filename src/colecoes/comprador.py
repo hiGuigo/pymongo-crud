@@ -5,7 +5,7 @@ database = connect()
 
 collection = database["compradores"]
 
-#FUNÇÃO AUXILIARES
+#FUNÇÃO AUXILIAR
 def encontrarCompradorUnico(email):
     return collection.find_one({"email": email})
 

@@ -6,7 +6,7 @@ database = connect()
 
 collection = database["produtos"]
 
-#FUNÇÕES AUXILIARES
+# FUNÇÕES AUXILIARES
 def encontrarProdutosVendedor(email):
     return list(collection.find({"vendedor.email_vendedor": email}))
 
